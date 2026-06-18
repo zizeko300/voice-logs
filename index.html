@@ -25,124 +25,141 @@
 
         .app-container {
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
             margin: 0 auto;
             background: white;
-            border-radius: 32px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            padding: 24px;
+            border-radius: 34px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            padding: 28px 20px 32px;
             position: relative;
         }
 
-        /* 顶部装饰 */
-        .header-deco {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(90deg, #999 0%, #ccc 100%);
-            border-radius: 2px;
-            margin-top: 12px;
+        h1 {
+            font-size: 27px;
+            font-weight: 650;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+            color: #000;
         }
 
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
+        .subhead {
+            font-size: 14px;
+            color: #888;
             margin-bottom: 24px;
-            text-align: center;
-            letter-spacing: -0.5px;
+            font-weight: 430;
         }
 
         .logs-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 18px;
         }
 
         .log-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 20px;
-            background: #fafafa;
-            border-radius: 20px;
-            border: 1px solid #eee;
-            transition: all 0.2s ease;
+            padding: 18px 22px;
+            background: #f8f8fc;
+            border-radius: 26px;
+            border: 1px solid #efeff2;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            min-height: 72px;
         }
 
         .log-item:active {
-            background: #f0f0f0;
-            transform: scale(0.98);
+            background: #edeef2;
+            transform: scale(0.985);
         }
 
         .log-info {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
+            flex: 1;
         }
 
         .log-title {
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 620;
+            font-size: 18px;
+            letter-spacing: -0.2px;
+            color: #111;
         }
 
         .log-duration {
-            font-size: 13px;
-            color: #888;
+            font-size: 14px;
+            color: #8a8a8e;
+            font-weight: 410;
         }
 
+        /* ----- 超大播放按钮 ----- */
         .play-btn {
-            width: 44px;
-            height: 44px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
             background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.08s, background 0.15s;
+            flex-shrink: 0;
+            margin-left: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .play-btn:active {
-            transform: scale(0.9);
+            transform: scale(0.92);
+            background: #222;
         }
 
         .play-icon {
             width: 0;
             height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 12px solid white;
-            margin-left: 3px;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-left: 18px solid white;
+            margin-left: 5px;
+            transition: border 0.1s;
         }
 
+        /* 播放中显示暂停图标 */
         .playing .play-icon {
             border: none;
-            width: 16px;
-            height: 16px;
+            width: 24px;
+            height: 24px;
             background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/%3E%3C/svg%3E") center/contain no-repeat;
+            margin-left: 0;
         }
-        
+
         .status-bar {
-            font-size: 12px;
+            font-size: 13px;
             color: #aaa;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: right;
+        }
+
+        .footer-note {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 13px;
+            color: #bbb;
+            border-top: 1px solid #f0f0f2;
+            padding-top: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="header-deco"></div>
-    <div class="status-bar">● Online</div>
+    <div class="status-bar">● 5 files</div>
     
     <h1>Voice Logs</h1>
+    <div class="subhead">König · secure channel</div>
     
     <div class="logs-list">
-        <!-- 这里的 data-audio 已经去掉了 audio/ 前缀，直接指向根目录的文件 -->
+        <!-- 音频文件直接放在根目录，路径已简化 -->
         <div class="log-item" data-audio="log1.mp3" data-duration="03:42">
             <div class="log-info">
                 <div class="log-title">Log_01</div>
@@ -193,6 +210,8 @@
             </div>
         </div>
     </div>
+
+    <div class="footer-note">tap to play · pause</div>
 </div>
 
 <script>
@@ -238,6 +257,16 @@
                 currentAudio.addEventListener('ended', () => {
                     item.classList.remove('playing');
                 });
+            });
+        });
+
+        // 点击整行也能触发播放（增加点击区域）
+        document.querySelectorAll('.log-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // 如果点的是按钮本身，上面的事件已经处理了，这里跳过
+                if (e.target.closest('.play-btn')) return;
+                const btn = this.querySelector('.play-btn');
+                if (btn) btn.click();
             });
         });
     });
