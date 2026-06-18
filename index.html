@@ -162,7 +162,7 @@
             border: 1px solid #efeff2;
             transition: all 0.15s ease;
             cursor: pointer;
-            min-height: 76px;
+            min-height: 82px;
         }
 
         .log-item:active {
@@ -187,7 +187,25 @@
         .log-duration {
             font-size: 14px;
             color: #8a8a8e;
-            font-weight: 410;
+            font-weight: 510;
+        }
+
+        /* ----- 进度条容器 ----- */
+        .progress-wrap {
+            width: 68px;
+            height: 4px;
+            background: #dddde3;
+            border-radius: 6px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000;
+            border-radius: 6px;
+            width: 0%;
+            transition: width 0.1s linear;
         }
 
         /* ----- 超大播放按钮 ----- */
@@ -221,7 +239,6 @@
             transition: border 0.1s;
         }
 
-        /* 播放中显示暂停图标 */
         .playing .play-icon {
             border: none;
             width: 24px;
@@ -290,38 +307,48 @@
         <div class="subhead">König · secure channel</div>
         
         <div class="logs-list">
-            <div class="log-item" data-audio="log1.mp3" data-duration="03:42">
+            <!-- log1: 36秒 -->
+            <div class="log-item" data-audio="log1.mp3" data-duration="00:36">
                 <div class="log-info">
                     <div class="log-title">Log_01</div>
-                    <div class="log-duration">03:42</div>
+                    <div class="log-duration">00:36</div>
+                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
-            <div class="log-item" data-audio="log2.mp3" data-duration="05:11">
+            <!-- log2: 36秒 -->
+            <div class="log-item" data-audio="log2.mp3" data-duration="00:36">
                 <div class="log-info">
                     <div class="log-title">Log_02</div>
-                    <div class="log-duration">05:11</div>
+                    <div class="log-duration">00:36</div>
+                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
-            <div class="log-item" data-audio="log3.mp3" data-duration="04:29">
+            <!-- log3: 30秒 -->
+            <div class="log-item" data-audio="log3.mp3" data-duration="00:30">
                 <div class="log-info">
                     <div class="log-title">Log_03</div>
-                    <div class="log-duration">04:29</div>
+                    <div class="log-duration">00:30</div>
+                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
-            <div class="log-item" data-audio="log4.mp3" data-duration="06:05">
+            <!-- log4: 34秒 -->
+            <div class="log-item" data-audio="log4.mp3" data-duration="00:34">
                 <div class="log-info">
                     <div class="log-title">Log_04</div>
-                    <div class="log-duration">06:05</div>
+                    <div class="log-duration">00:34</div>
+                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
-            <div class="log-item" data-audio="log5.mp3" data-duration="02:58">
+            <!-- log5: 34秒 -->
+            <div class="log-item" data-audio="log5.mp3" data-duration="00:34">
                 <div class="log-info">
                     <div class="log-title">Log_05</div>
-                    <div class="log-duration">02:58</div>
+                    <div class="log-duration">00:34</div>
+                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
@@ -355,12 +382,14 @@
 
         // 锁定
         function lockInterface() {
-            // 停止所有音频
             if (window.currentAudio) {
                 window.currentAudio.pause();
                 window.currentAudio.currentTime = 0;
                 if (window.currentItem) {
                     window.currentItem.classList.remove('playing');
+                    // 重置进度条
+                    const fill = window.currentItem.querySelector('.progress-fill');
+                    if (fill) fill.style.width = '0%';
                 }
                 window.currentAudio = null;
                 window.currentItem = null;
@@ -372,7 +401,6 @@
             passwordInput.focus();
         }
 
-        // 验证密码
         function attemptUnlock() {
             const inputVal = passwordInput.value.trim();
             if (inputVal === CORRECT_PASSWORD) {
@@ -406,7 +434,6 @@
             lockInterface();
         });
 
-        // 初始状态：显示锁屏
         lockScreen.style.display = 'flex';
         logsContainer.style.display = 'none';
 
@@ -420,7 +447,7 @@
             errorMsg.textContent = '';
         });
 
-        // ---------- 音频播放 ----------
+        // ---------- 音频播放 + 进度条 ----------
         const playButtons = document.querySelectorAll('.play-btn');
         
         playButtons.forEach(btn => {
@@ -428,6 +455,9 @@
                 e.stopPropagation();
                 const item = btn.closest('.log-item');
                 const audioSrc = item.getAttribute('data-audio');
+                const durationStr = item.getAttribute('data-duration'); // "00:36" 格式
+                const parts = durationStr.split(':');
+                const totalSeconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
                 
                 if (window.currentItem === item) {
                     if (window.currentAudio && !window.currentAudio.paused) {
@@ -440,20 +470,35 @@
                 if (window.currentAudio) {
                     window.currentAudio.pause();
                     window.currentAudio.currentTime = 0;
-                    if (window.currentItem) window.currentItem.classList.remove('playing');
+                    if (window.currentItem) {
+                        window.currentItem.classList.remove('playing');
+                        const oldFill = window.currentItem.querySelector('.progress-fill');
+                        if (oldFill) oldFill.style.width = '0%';
+                    }
                 }
 
-                window.currentAudio = new Audio(audioSrc);
+                const audio = new Audio(audioSrc);
+                window.currentAudio = audio;
                 window.currentItem = item;
                 
-                window.currentAudio.play().then(() => {
+                // 实时更新进度条
+                audio.addEventListener('timeupdate', () => {
+                    if (!audio.duration) return;
+                    const percent = (audio.currentTime / audio.duration) * 100;
+                    const fill = item.querySelector('.progress-fill');
+                    if (fill) fill.style.width = Math.min(percent, 100) + '%';
+                });
+
+                audio.play().then(() => {
                     item.classList.add('playing');
                 }).catch(err => {
                     alert('⚠️ audio file not found: ' + audioSrc);
                 });
 
-                window.currentAudio.addEventListener('ended', () => {
+                audio.addEventListener('ended', () => {
                     item.classList.remove('playing');
+                    const fill = item.querySelector('.progress-fill');
+                    if (fill) fill.style.width = '0%';
                 });
             });
         });
@@ -467,7 +512,6 @@
             });
         });
 
-        // 防止表单提交
         const formDummy = document.querySelector('.password-input-wrapper');
         formDummy.addEventListener('submit', function(e) { e.preventDefault(); });
     })();
