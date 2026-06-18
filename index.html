@@ -34,6 +34,103 @@
             position: relative;
         }
 
+        /* ---------- 锁屏界面 ---------- */
+        .lock-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 12px 40px;
+            min-height: 360px;
+        }
+
+        .lock-icon {
+            font-size: 54px;
+            margin-bottom: 8px;
+        }
+
+        .lock-title {
+            font-size: 26px;
+            font-weight: 660;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+
+        .lock-hint {
+            font-size: 15px;
+            color: #888;
+            margin-bottom: 28px;
+            font-weight: 400;
+        }
+
+        .password-input-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .password-field {
+            width: 100%;
+            padding: 18px 22px;
+            border: 1.5px solid #e5e5ea;
+            border-radius: 70px;
+            font-size: 18px;
+            background: #f9f9fb;
+            outline: none;
+            transition: border 0.2s, background 0.2s;
+            text-align: center;
+            letter-spacing: 2px;
+            color: #111;
+            font-weight: 450;
+        }
+
+        .password-field:focus {
+            border-color: #007aff;
+            background: white;
+        }
+
+        .password-field::placeholder {
+            color: #b0b0b5;
+            letter-spacing: 0.3px;
+            font-weight: 380;
+            font-size: 16px;
+        }
+
+        .unlock-btn {
+            background: #000;
+            border: none;
+            border-radius: 80px;
+            padding: 18px 26px;
+            font-size: 18px;
+            font-weight: 590;
+            color: white;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.08s;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+            letter-spacing: 0.5px;
+            width: 100%;
+        }
+
+        .unlock-btn:active {
+            background: #222;
+            transform: scale(0.96);
+        }
+
+        .error-message {
+            color: #d70015;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            min-height: 22px;
+            font-weight: 470;
+        }
+
+        /* ---------- 日志列表（默认隐藏） ---------- */
+        .logs-container {
+            display: none;
+        }
+
         h1 {
             font-size: 27px;
             font-weight: 650;
@@ -65,7 +162,7 @@
             border: 1px solid #efeff2;
             transition: all 0.15s ease;
             cursor: pointer;
-            min-height: 72px;
+            min-height: 76px;
         }
 
         .log-item:active {
@@ -95,8 +192,8 @@
 
         /* ----- 超大播放按钮 ----- */
         .play-btn {
-            width: 64px;
-            height: 64px;
+            width: 62px;
+            height: 62px;
             border-radius: 50%;
             background: #000;
             display: flex;
@@ -106,11 +203,11 @@
             transition: transform 0.08s, background 0.15s;
             flex-shrink: 0;
             margin-left: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
         }
 
         .play-btn:active {
-            transform: scale(0.92);
+            transform: scale(0.88);
             background: #222;
         }
 
@@ -148,128 +245,232 @@
             border-top: 1px solid #f0f0f2;
             padding-top: 20px;
         }
+
+        .relock-area {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .relock-btn {
+            background: none;
+            border: none;
+            color: #8e8e93;
+            font-size: 14px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            text-decoration-color: #ccc;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        .relock-btn:active {
+            color: #007aff;
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="status-bar">● 5 files</div>
-    
-    <h1>Voice Logs</h1>
-    <div class="subhead">König · secure channel</div>
-    
-    <div class="logs-list">
-        <!-- 音频文件直接放在根目录，路径已简化 -->
-        <div class="log-item" data-audio="log1.mp3" data-duration="03:42">
-            <div class="log-info">
-                <div class="log-title">Log_01</div>
-                <div class="log-duration">03:42</div>
-            </div>
-            <div class="play-btn">
-                <div class="play-icon"></div>
-            </div>
+    <!-- 锁屏 -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-icon">🎙️</div>
+        <div class="lock-title">Voice Logs</div>
+        <div class="lock-hint">enter passcode to access</div>
+        <div class="password-input-wrapper">
+            <input type="password" id="passwordInput" class="password-field" placeholder="passcode" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <button class="unlock-btn" id="unlockBtn">Unlock</button>
         </div>
-
-        <div class="log-item" data-audio="log2.mp3" data-duration="05:11">
-            <div class="log-info">
-                <div class="log-title">Log_02</div>
-                <div class="log-duration">05:11</div>
-            </div>
-            <div class="play-btn">
-                <div class="play-icon"></div>
-            </div>
-        </div>
-
-        <div class="log-item" data-audio="log3.mp3" data-duration="04:29">
-            <div class="log-info">
-                <div class="log-title">Log_03</div>
-                <div class="log-duration">04:29</div>
-            </div>
-            <div class="play-btn">
-                <div class="play-icon"></div>
-            </div>
-        </div>
-
-        <div class="log-item" data-audio="log4.mp3" data-duration="06:05">
-            <div class="log-info">
-                <div class="log-title">Log_04</div>
-                <div class="log-duration">06:05</div>
-            </div>
-            <div class="play-btn">
-                <div class="play-icon"></div>
-            </div>
-        </div>
-
-        <div class="log-item" data-audio="log5.mp3" data-duration="02:58">
-            <div class="log-info">
-                <div class="log-title">Log_05</div>
-                <div class="log-duration">02:58</div>
-            </div>
-            <div class="play-btn">
-                <div class="play-icon"></div>
-            </div>
-        </div>
+        <div class="error-message" id="errorMsg"></div>
     </div>
 
-    <div class="footer-note">tap to play · pause</div>
+    <!-- 日志列表 -->
+    <div class="logs-container" id="logsContainer">
+        <div class="status-bar">● 5 files</div>
+        <h1>Voice Logs</h1>
+        <div class="subhead">König · secure channel</div>
+        
+        <div class="logs-list">
+            <div class="log-item" data-audio="log1.mp3" data-duration="03:42">
+                <div class="log-info">
+                    <div class="log-title">Log_01</div>
+                    <div class="log-duration">03:42</div>
+                </div>
+                <div class="play-btn"><div class="play-icon"></div></div>
+            </div>
+            <div class="log-item" data-audio="log2.mp3" data-duration="05:11">
+                <div class="log-info">
+                    <div class="log-title">Log_02</div>
+                    <div class="log-duration">05:11</div>
+                </div>
+                <div class="play-btn"><div class="play-icon"></div></div>
+            </div>
+            <div class="log-item" data-audio="log3.mp3" data-duration="04:29">
+                <div class="log-info">
+                    <div class="log-title">Log_03</div>
+                    <div class="log-duration">04:29</div>
+                </div>
+                <div class="play-btn"><div class="play-icon"></div></div>
+            </div>
+            <div class="log-item" data-audio="log4.mp3" data-duration="06:05">
+                <div class="log-info">
+                    <div class="log-title">Log_04</div>
+                    <div class="log-duration">06:05</div>
+                </div>
+                <div class="play-btn"><div class="play-icon"></div></div>
+            </div>
+            <div class="log-item" data-audio="log5.mp3" data-duration="02:58">
+                <div class="log-info">
+                    <div class="log-title">Log_05</div>
+                    <div class="log-duration">02:58</div>
+                </div>
+                <div class="play-btn"><div class="play-icon"></div></div>
+            </div>
+        </div>
+
+        <div class="footer-note">tap to play · pause</div>
+        <div class="relock-area">
+            <button class="relock-btn" id="relockBtn">← lock logs</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const playButtons = document.querySelectorAll('.play-btn');
-        let currentAudio = null;
-        let currentItem = null;
+    (function() {
+        const CORRECT_PASSWORD = "KT-koenig-voice";
 
+        const lockScreen = document.getElementById('lockScreen');
+        const logsContainer = document.getElementById('logsContainer');
+        const passwordInput = document.getElementById('passwordInput');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const relockBtn = document.getElementById('relockBtn');
+
+        // 解锁
+        function unlockInterface() {
+            lockScreen.style.display = 'none';
+            logsContainer.style.display = 'block';
+            errorMsg.textContent = '';
+            passwordInput.value = '';
+        }
+
+        // 锁定
+        function lockInterface() {
+            // 停止所有音频
+            if (window.currentAudio) {
+                window.currentAudio.pause();
+                window.currentAudio.currentTime = 0;
+                if (window.currentItem) {
+                    window.currentItem.classList.remove('playing');
+                }
+                window.currentAudio = null;
+                window.currentItem = null;
+            }
+            lockScreen.style.display = 'flex';
+            logsContainer.style.display = 'none';
+            errorMsg.textContent = '';
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+
+        // 验证密码
+        function attemptUnlock() {
+            const inputVal = passwordInput.value.trim();
+            if (inputVal === CORRECT_PASSWORD) {
+                unlockInterface();
+            } else {
+                errorMsg.textContent = '✗ wrong passcode · try again';
+                passwordInput.value = '';
+                passwordInput.focus();
+                passwordInput.style.transition = 'border 0.1s';
+                passwordInput.style.borderColor = '#d70015';
+                setTimeout(() => {
+                    passwordInput.style.borderColor = '#e5e5ea';
+                }, 300);
+            }
+        }
+
+        unlockBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            attemptUnlock();
+        });
+
+        passwordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                attemptUnlock();
+            }
+        });
+
+        relockBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            lockInterface();
+        });
+
+        // 初始状态：显示锁屏
+        lockScreen.style.display = 'flex';
+        logsContainer.style.display = 'none';
+
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                passwordInput.focus();
+            }, 300);
+        });
+
+        passwordInput.addEventListener('input', function() {
+            errorMsg.textContent = '';
+        });
+
+        // ---------- 音频播放 ----------
+        const playButtons = document.querySelectorAll('.play-btn');
+        
         playButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const item = btn.closest('.log-item');
                 const audioSrc = item.getAttribute('data-audio');
                 
-                // 如果点击的是正在播放的，就暂停
-                if (currentItem === item) {
-                    if (currentAudio && !currentAudio.paused) {
-                        currentAudio.pause();
+                if (window.currentItem === item) {
+                    if (window.currentAudio && !window.currentAudio.paused) {
+                        window.currentAudio.pause();
                         item.classList.remove('playing');
                         return;
                     }
                 }
 
-                // 停止上一个
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                    if (currentItem) currentItem.classList.remove('playing');
+                if (window.currentAudio) {
+                    window.currentAudio.pause();
+                    window.currentAudio.currentTime = 0;
+                    if (window.currentItem) window.currentItem.classList.remove('playing');
                 }
 
-                // 播放新的
-                currentAudio = new Audio(audioSrc);
-                currentItem = item;
+                window.currentAudio = new Audio(audioSrc);
+                window.currentItem = item;
                 
-                currentAudio.play().then(() => {
+                window.currentAudio.play().then(() => {
                     item.classList.add('playing');
                 }).catch(err => {
-                    alert('播放失败，请检查文件名是否正确：' + audioSrc);
-                    console.error(err);
+                    alert('⚠️ audio file not found: ' + audioSrc);
                 });
 
-                // 播放结束自动移除样式
-                currentAudio.addEventListener('ended', () => {
+                window.currentAudio.addEventListener('ended', () => {
                     item.classList.remove('playing');
                 });
             });
         });
 
-        // 点击整行也能触发播放（增加点击区域）
+        // 点击整行也能触发
         document.querySelectorAll('.log-item').forEach(item => {
             item.addEventListener('click', function(e) {
-                // 如果点的是按钮本身，上面的事件已经处理了，这里跳过
                 if (e.target.closest('.play-btn')) return;
                 const btn = this.querySelector('.play-btn');
                 if (btn) btn.click();
             });
         });
-    });
+
+        // 防止表单提交
+        const formDummy = document.querySelector('.password-input-wrapper');
+        formDummy.addEventListener('submit', function(e) { e.preventDefault(); });
+    })();
 </script>
 
 </body>
