@@ -146,6 +146,34 @@
             font-weight: 430;
         }
 
+        /* ---------- 弹幕区域 ---------- */
+        .danmu-box {
+            background: #f4f4f8;
+            border-radius: 20px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+            min-height: 110px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #ececf0;
+            transition: background 0.2s;
+        }
+
+        .danmu-text {
+            font-size: 15px;
+            line-height: 1.55;
+            color: #222;
+            font-weight: 420;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .danmu-placeholder {
+            color: #b0b0b5;
+            font-style: italic;
+            font-size: 14px;
+        }
+
         .logs-list {
             display: flex;
             flex-direction: column;
@@ -190,7 +218,6 @@
             font-weight: 510;
         }
 
-        /* ----- 进度条容器 ----- */
         .progress-wrap {
             width: 68px;
             height: 4px;
@@ -208,7 +235,6 @@
             transition: width 0.1s linear;
         }
 
-        /* ----- 超大播放按钮 ----- */
         .play-btn {
             width: 62px;
             height: 62px;
@@ -306,9 +332,14 @@
         <h1>Voice Logs</h1>
         <div class="subhead">König · secure channel</div>
         
+        <!-- 弹幕显示区 -->
+        <div class="danmu-box" id="danmuBox">
+            <div class="danmu-text danmu-placeholder" id="danmuText">🎤 tap a log to hear König's voice</div>
+        </div>
+
         <div class="logs-list">
-            <!-- log1: 36秒 -->
-            <div class="log-item" data-audio="log1.mp3" data-duration="00:36">
+            <div class="log-item" data-audio="log1.mp3" data-duration="00:36" data-danmu="It's May 12, 2024, 4:23 PM. This is König.
+The rain came fast. I found a cave to shelter in. It's quiet here, just the sound of rain filling everything. Too humid for a fire. My clothes are wet, my toes are numb, but I'm okay. Outside is just gray fog. The world has shrunk to this cave entrance. I heard something. Maybe a deer, maybe just rain. That's all.">
                 <div class="log-info">
                     <div class="log-title">Log_01</div>
                     <div class="log-duration">00:36</div>
@@ -316,8 +347,8 @@
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
-            <!-- log2: 36秒 -->
-            <div class="log-item" data-audio="log2.mp3" data-duration="00:36">
+            <div class="log-item" data-audio="log2.mp3" data-duration="00:36" data-danmu="It's June 3, 2024, 4:55 AM. This is König.
+I'm at the highest point of the east ridge, ten minutes early. The air is cold and clean before dawn. I'm waiting for the colors to change. White, then pale blue, then a streak of pink, then orange. Dawn comes faster than you think. I was thinking, I wish you were here. The sun is up now. I need to get down before the light gets too strong. Log complete.">
                 <div class="log-info">
                     <div class="log-title">Log_02</div>
                     <div class="log-duration">00:36</div>
@@ -325,8 +356,8 @@
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
-            <!-- log3: 30秒 -->
-            <div class="log-item" data-audio="log3.mp3" data-duration="00:30">
+            <div class="log-item" data-audio="log3.mp3" data-duration="00:30" data-danmu="It's July 22, 2024, 9:15 AM. This is König.
+I found a rabbit den near West Creek. The mother saw me, but she didn't run. I didn't move either. She relaxed after a moment. There are three or four kits. So small I can barely see their fur. She keeps licking their foreheads. I don't know why this scene made me feel something. Alright, I need to go. Log complete.">
                 <div class="log-info">
                     <div class="log-title">Log_03</div>
                     <div class="log-duration">00:30</div>
@@ -334,8 +365,8 @@
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
-            <!-- log4: 34秒 -->
-            <div class="log-item" data-audio="log4.mp3" data-duration="00:34">
+            <div class="log-item" data-audio="log4.mp3" data-duration="00:34" data-danmu="It's August 15, 2024, 3:40 PM. This is König.
+I'm walking through the forest between West Creek and the main ridge. I don't know why, but I started thinking of you. When you walk alone for too long, and it gets too quiet, your mind wanders. Today, I keep thinking about your face. Sometimes I pretend you're listening. I talk to myself as I walk. Alright, I need to keep moving. Log complete.">
                 <div class="log-info">
                     <div class="log-title">Log_04</div>
                     <div class="log-duration">00:34</div>
@@ -343,8 +374,8 @@
                 </div>
                 <div class="play-btn"><div class="play-icon"></div></div>
             </div>
-            <!-- log5: 34秒 -->
-            <div class="log-item" data-audio="log5.mp3" data-duration="00:34">
+            <div class="log-item" data-audio="log5.mp3" data-duration="00:34" data-danmu="It's September 29, 2024, 5:50 PM. This is König.
+I fell in the east rock zone. My right arm got cut on a sharp piece of slate. About four centimeters long. I rinsed it with creek water, cleaned it with iodine gauze, and wrapped it tight. Bleeding stopped. Lucky it's not my left hand, I can still write. I need to get back to base before sunset. Lesson: don't step on loose rocks. Log complete.">
                 <div class="log-info">
                     <div class="log-title">Log_05</div>
                     <div class="log-duration">00:34</div>
@@ -371,6 +402,8 @@
         const unlockBtn = document.getElementById('unlockBtn');
         const errorMsg = document.getElementById('errorMsg');
         const relockBtn = document.getElementById('relockBtn');
+        const danmuText = document.getElementById('danmuText');
+        const danmuBox = document.getElementById('danmuBox');
 
         // 解锁
         function unlockInterface() {
@@ -387,13 +420,15 @@
                 window.currentAudio.currentTime = 0;
                 if (window.currentItem) {
                     window.currentItem.classList.remove('playing');
-                    // 重置进度条
                     const fill = window.currentItem.querySelector('.progress-fill');
                     if (fill) fill.style.width = '0%';
                 }
                 window.currentAudio = null;
                 window.currentItem = null;
             }
+            // 重置弹幕
+            danmuText.textContent = '🎤 tap a log to hear König\'s voice';
+            danmuText.className = 'danmu-text danmu-placeholder';
             lockScreen.style.display = 'flex';
             logsContainer.style.display = 'none';
             errorMsg.textContent = '';
@@ -447,7 +482,7 @@
             errorMsg.textContent = '';
         });
 
-        // ---------- 音频播放 + 进度条 ----------
+        // ---------- 音频播放 + 进度条 + 弹幕 ----------
         const playButtons = document.querySelectorAll('.play-btn');
         
         playButtons.forEach(btn => {
@@ -455,9 +490,7 @@
                 e.stopPropagation();
                 const item = btn.closest('.log-item');
                 const audioSrc = item.getAttribute('data-audio');
-                const durationStr = item.getAttribute('data-duration'); // "00:36" 格式
-                const parts = durationStr.split(':');
-                const totalSeconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+                const danmuContent = item.getAttribute('data-danmu');
                 
                 if (window.currentItem === item) {
                     if (window.currentAudio && !window.currentAudio.paused) {
@@ -477,11 +510,19 @@
                     }
                 }
 
+                // 显示弹幕
+                if (danmuContent) {
+                    danmuText.textContent = danmuContent;
+                    danmuText.className = 'danmu-text';
+                } else {
+                    danmuText.textContent = '🎤 no transcript available';
+                    danmuText.className = 'danmu-text danmu-placeholder';
+                }
+
                 const audio = new Audio(audioSrc);
                 window.currentAudio = audio;
                 window.currentItem = item;
                 
-                // 实时更新进度条
                 audio.addEventListener('timeupdate', () => {
                     if (!audio.duration) return;
                     const percent = (audio.currentTime / audio.duration) * 100;
