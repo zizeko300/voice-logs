@@ -146,56 +146,32 @@
             font-weight: 430;
         }
 
-        /* ---------- 弹幕区域 ---------- */
-        .danmu-box {
-            background: #f4f4f8;
-            border-radius: 20px;
-            padding: 16px 18px;
-            margin-bottom: 20px;
-            min-height: 110px;
-            display: flex;
-            align-items: center;
-            border: 1px solid #ececf0;
-            transition: background 0.2s;
-        }
-
-        .danmu-text {
-            font-size: 15px;
-            line-height: 1.55;
-            color: #222;
-            font-weight: 420;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
-
-        .danmu-placeholder {
-            color: #b0b0b5;
-            font-style: italic;
-            font-size: 14px;
-        }
-
         .logs-list {
             display: flex;
             flex-direction: column;
             gap: 18px;
         }
 
-        .log-item {
+        /* 每个日志卡片（包裹主体 + 转录本） */
+        .log-card {
+            background: #f8f8fc;
+            border-radius: 26px;
+            border: 1px solid #efeff2;
+            overflow: hidden;
+            transition: all 0.15s ease;
+        }
+
+        .log-card:active {
+            background: #edeef2;
+        }
+
+        .log-main {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 18px 22px;
-            background: #f8f8fc;
-            border-radius: 26px;
-            border: 1px solid #efeff2;
-            transition: all 0.15s ease;
             cursor: pointer;
             min-height: 82px;
-        }
-
-        .log-item:active {
-            background: #edeef2;
-            transform: scale(0.985);
         }
 
         .log-info {
@@ -273,6 +249,44 @@
             margin-left: 0;
         }
 
+        /* “查看日志内容”按钮 */
+        .transcript-toggle {
+            font-size: 13px;
+            color: #8a8a8e;
+            font-weight: 470;
+            background: none;
+            border: none;
+            padding: 6px 22px 10px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            text-align: left;
+            letter-spacing: 0.2px;
+            transition: color 0.1s;
+        }
+
+        .transcript-toggle:active {
+            color: #007aff;
+        }
+
+        /* 转录本文本区域（默认隐藏） */
+        .transcript-body {
+            padding: 0 22px 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            word-break: break-word;
+            display: none;
+            border-top: 1px solid #e8e8ee;
+            margin: 0 12px;
+            padding-top: 12px;
+        }
+
+        .transcript-body.open {
+            display: block;
+        }
+
         .status-bar {
             font-size: 13px;
             color: #aaa;
@@ -331,57 +345,81 @@
         <div class="status-bar">● 5 files</div>
         <h1>Voice Logs</h1>
         <div class="subhead">König · secure channel</div>
-        
-        <!-- 弹幕显示区 -->
-        <div class="danmu-box" id="danmuBox">
-            <div class="danmu-text danmu-placeholder" id="danmuText">🎤 tap a log to hear König's voice</div>
-        </div>
 
         <div class="logs-list">
-            <div class="log-item" data-audio="log1.mp3" data-duration="00:36" data-danmu="It's May 12, 2024, 4:23 PM. This is König.
-The rain came fast. I found a cave to shelter in. It's quiet here, just the sound of rain filling everything. Too humid for a fire. My clothes are wet, my toes are numb, but I'm okay. Outside is just gray fog. The world has shrunk to this cave entrance. I heard something. Maybe a deer, maybe just rain. That's all.">
-                <div class="log-info">
-                    <div class="log-title">Log_01</div>
-                    <div class="log-duration">00:36</div>
-                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+            <!-- Log 1 -->
+            <div class="log-card">
+                <div class="log-main" data-audio="log1.mp3">
+                    <div class="log-info">
+                        <div class="log-title">Log_01</div>
+                        <div class="log-duration">00:36</div>
+                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+                    </div>
+                    <div class="play-btn"><div class="play-icon"></div></div>
                 </div>
-                <div class="play-btn"><div class="play-icon"></div></div>
+                <button class="transcript-toggle">view transcript</button>
+                <div class="transcript-body">It's May 12, 2024, 4:23 PM. This is König.
+The rain came fast. I found a cave to shelter in. It's quiet here, just the sound of rain filling everything. Too humid for a fire. My clothes are wet, my toes are numb, but I'm okay. Outside is just gray fog. The world has shrunk to this cave entrance. I heard something. Maybe a deer, maybe just rain. That's all.</div>
             </div>
-            <div class="log-item" data-audio="log2.mp3" data-duration="00:36" data-danmu="It's June 3, 2024, 4:55 AM. This is König.
-I'm at the highest point of the east ridge, ten minutes early. The air is cold and clean before dawn. I'm waiting for the colors to change. White, then pale blue, then a streak of pink, then orange. Dawn comes faster than you think. I was thinking, I wish you were here. The sun is up now. I need to get down before the light gets too strong. Log complete.">
-                <div class="log-info">
-                    <div class="log-title">Log_02</div>
-                    <div class="log-duration">00:36</div>
-                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+
+            <!-- Log 2 -->
+            <div class="log-card">
+                <div class="log-main" data-audio="log2.mp3">
+                    <div class="log-info">
+                        <div class="log-title">Log_02</div>
+                        <div class="log-duration">00:36</div>
+                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+                    </div>
+                    <div class="play-btn"><div class="play-icon"></div></div>
                 </div>
-                <div class="play-btn"><div class="play-icon"></div></div>
+                <button class="transcript-toggle">view transcript</button>
+                <div class="transcript-body">It's June 3, 2024, 4:55 AM. This is König.
+I'm at the highest point of the east ridge, ten minutes early. The air is cold and clean before dawn. I'm waiting for the colors to change. White, then pale blue, then a streak of pink, then orange. Dawn comes faster than you think. I was thinking, I wish you were here. The sun is up now. I need to get down before the light gets too strong. Log complete.</div>
             </div>
-            <div class="log-item" data-audio="log3.mp3" data-duration="00:30" data-danmu="It's July 22, 2024, 9:15 AM. This is König.
-I found a rabbit den near West Creek. The mother saw me, but she didn't run. I didn't move either. She relaxed after a moment. There are three or four kits. So small I can barely see their fur. She keeps licking their foreheads. I don't know why this scene made me feel something. Alright, I need to go. Log complete.">
-                <div class="log-info">
-                    <div class="log-title">Log_03</div>
-                    <div class="log-duration">00:30</div>
-                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+
+            <!-- Log 3 -->
+            <div class="log-card">
+                <div class="log-main" data-audio="log3.mp3">
+                    <div class="log-info">
+                        <div class="log-title">Log_03</div>
+                        <div class="log-duration">00:30</div>
+                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+                    </div>
+                    <div class="play-btn"><div class="play-icon"></div></div>
                 </div>
-                <div class="play-btn"><div class="play-icon"></div></div>
+                <button class="transcript-toggle">view transcript</button>
+                <div class="transcript-body">It's July 22, 2024, 9:15 AM. This is König.
+I found a rabbit den near West Creek. The mother saw me, but she didn't run. I didn't move either. She relaxed after a moment. There are three or four kits. So small I can barely see their fur. She keeps licking their foreheads. I don't know why this scene made me feel something. Alright, I need to go. Log complete.</div>
             </div>
-            <div class="log-item" data-audio="log4.mp3" data-duration="00:34" data-danmu="It's August 15, 2024, 3:40 PM. This is König.
-I'm walking through the forest between West Creek and the main ridge. I don't know why, but I started thinking of you. When you walk alone for too long, and it gets too quiet, your mind wanders. Today, I keep thinking about your face. Sometimes I pretend you're listening. I talk to myself as I walk. Alright, I need to keep moving. Log complete.">
-                <div class="log-info">
-                    <div class="log-title">Log_04</div>
-                    <div class="log-duration">00:34</div>
-                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+
+            <!-- Log 4 -->
+            <div class="log-card">
+                <div class="log-main" data-audio="log4.mp3">
+                    <div class="log-info">
+                        <div class="log-title">Log_04</div>
+                        <div class="log-duration">00:34</div>
+                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+                    </div>
+                    <div class="play-btn"><div class="play-icon"></div></div>
                 </div>
-                <div class="play-btn"><div class="play-icon"></div></div>
+                <button class="transcript-toggle">view transcript</button>
+                <div class="transcript-body">It's August 15, 2024, 3:40 PM. This is König.
+I'm walking through the forest between West Creek and the main ridge. I don't know why, but I started thinking of you. When you walk alone for too long, and it gets too quiet, your mind wanders. Today, I keep thinking about your face. Sometimes I pretend you're listening. I talk to myself as I walk. Alright, I need to keep moving. Log complete.</div>
             </div>
-            <div class="log-item" data-audio="log5.mp3" data-duration="00:34" data-danmu="It's September 29, 2024, 5:50 PM. This is König.
-I fell in the east rock zone. My right arm got cut on a sharp piece of slate. About four centimeters long. I rinsed it with creek water, cleaned it with iodine gauze, and wrapped it tight. Bleeding stopped. Lucky it's not my left hand, I can still write. I need to get back to base before sunset. Lesson: don't step on loose rocks. Log complete.">
-                <div class="log-info">
-                    <div class="log-title">Log_05</div>
-                    <div class="log-duration">00:34</div>
-                    <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+
+            <!-- Log 5 -->
+            <div class="log-card">
+                <div class="log-main" data-audio="log5.mp3">
+                    <div class="log-info">
+                        <div class="log-title">Log_05</div>
+                        <div class="log-duration">00:34</div>
+                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+                    </div>
+                    <div class="play-btn"><div class="play-icon"></div></div>
                 </div>
-                <div class="play-btn"><div class="play-icon"></div></div>
+                <button class="transcript-toggle">view transcript</button>
+                <div class="transcript-body">It's September 29, 2024, 5:50 PM. This is König.
+I fell in the east rock zone. My right arm got cut on a sharp piece of slate. About four centimeters long. I rinsed it with creek water, cleaned it with iodine gauze, and wrapped it tight. Bleeding stopped. Lucky it's not my left hand, I can still write. I need to get back to base before sunset. Lesson: don't step on loose rocks. Log complete.</div>
             </div>
         </div>
 
@@ -402,8 +440,6 @@ I fell in the east rock zone. My right arm got cut on a sharp piece of slate. Ab
         const unlockBtn = document.getElementById('unlockBtn');
         const errorMsg = document.getElementById('errorMsg');
         const relockBtn = document.getElementById('relockBtn');
-        const danmuText = document.getElementById('danmuText');
-        const danmuBox = document.getElementById('danmuBox');
 
         // 解锁
         function unlockInterface() {
@@ -426,9 +462,6 @@ I fell in the east rock zone. My right arm got cut on a sharp piece of slate. Ab
                 window.currentAudio = null;
                 window.currentItem = null;
             }
-            // 重置弹幕
-            danmuText.textContent = '🎤 tap a log to hear König\'s voice';
-            danmuText.className = 'danmu-text danmu-placeholder';
             lockScreen.style.display = 'flex';
             logsContainer.style.display = 'none';
             errorMsg.textContent = '';
@@ -482,15 +515,15 @@ I fell in the east rock zone. My right arm got cut on a sharp piece of slate. Ab
             errorMsg.textContent = '';
         });
 
-        // ---------- 音频播放 + 进度条 + 弹幕 ----------
+        // ---------- 音频播放 + 进度条 ----------
         const playButtons = document.querySelectorAll('.play-btn');
         
         playButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const item = btn.closest('.log-item');
+                const main = btn.closest('.log-main');
+                const item = main;
                 const audioSrc = item.getAttribute('data-audio');
-                const danmuContent = item.getAttribute('data-danmu');
                 
                 if (window.currentItem === item) {
                     if (window.currentAudio && !window.currentAudio.paused) {
@@ -508,15 +541,6 @@ I fell in the east rock zone. My right arm got cut on a sharp piece of slate. Ab
                         const oldFill = window.currentItem.querySelector('.progress-fill');
                         if (oldFill) oldFill.style.width = '0%';
                     }
-                }
-
-                // 显示弹幕
-                if (danmuContent) {
-                    danmuText.textContent = danmuContent;
-                    danmuText.className = 'danmu-text';
-                } else {
-                    danmuText.textContent = '🎤 no transcript available';
-                    danmuText.className = 'danmu-text danmu-placeholder';
                 }
 
                 const audio = new Audio(audioSrc);
@@ -544,12 +568,28 @@ I fell in the east rock zone. My right arm got cut on a sharp piece of slate. Ab
             });
         });
 
-        // 点击整行也能触发
-        document.querySelectorAll('.log-item').forEach(item => {
-            item.addEventListener('click', function(e) {
+        // 点击整行（log-main）也能触发播放
+        document.querySelectorAll('.log-main').forEach(main => {
+            main.addEventListener('click', function(e) {
                 if (e.target.closest('.play-btn')) return;
                 const btn = this.querySelector('.play-btn');
                 if (btn) btn.click();
+            });
+        });
+
+        // ---------- 转录本切换 ----------
+        document.querySelectorAll('.transcript-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const card = this.closest('.log-card');
+                const body = card.querySelector('.transcript-body');
+                if (body.classList.contains('open')) {
+                    body.classList.remove('open');
+                    this.textContent = 'view transcript';
+                } else {
+                    body.classList.add('open');
+                    this.textContent = 'hide transcript';
+                }
             });
         });
 
