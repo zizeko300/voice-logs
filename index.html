@@ -322,8 +322,8 @@
             <span>5 files</span>
         </div>
 
-        <!-- log items – click to play audio/audio/log1.mp3 etc. -->
-        <div class="log-item" data-audio="audio/log1.mp3">
+        <!-- log items – 音频文件直接放在根目录，路径简化为文件名 -->
+        <div class="log-item" data-audio="log1.mp3">
             <div class="log-index">1</div>
             <div class="log-info">
                 <div class="log-label">May 12, 2024</div>
@@ -335,7 +335,7 @@
             <div class="mock-wave"></div>
         </div>
 
-        <div class="log-item" data-audio="audio/log2.mp3">
+        <div class="log-item" data-audio="log2.mp3">
             <div class="log-index">2</div>
             <div class="log-info">
                 <div class="log-label">June 3, 2024</div>
@@ -347,7 +347,7 @@
             <div class="mock-wave"></div>
         </div>
 
-        <div class="log-item" data-audio="audio/log3.mp3">
+        <div class="log-item" data-audio="log3.mp3">
             <div class="log-index">3</div>
             <div class="log-info">
                 <div class="log-label">July 22, 2024</div>
@@ -359,7 +359,7 @@
             <div class="mock-wave"></div>
         </div>
 
-        <div class="log-item" data-audio="audio/log4.mp3">
+        <div class="log-item" data-audio="log4.mp3">
             <div class="log-index">4</div>
             <div class="log-info">
                 <div class="log-label">August 15, 2024</div>
@@ -371,7 +371,7 @@
             <div class="mock-wave"></div>
         </div>
 
-        <div class="log-item" data-audio="audio/log5.mp3">
+        <div class="log-item" data-audio="log5.mp3">
             <div class="log-index">5</div>
             <div class="log-info">
                 <div class="log-label">September 29, 2024</div>
@@ -437,7 +437,6 @@
             });
 
             audio.addEventListener('error', function() {
-                // silently fail – maybe file not found
                 if (logItem) {
                     logItem.classList.remove('playing');
                     const badge = logItem.querySelector('.play-badge');
@@ -445,7 +444,7 @@
                 }
                 currentAudio = null;
                 currentlyPlayingItem = null;
-                // optional short toast
+                // 显示简短提示
                 const toast = document.createElement('div');
                 toast.textContent = '⚠️ audio file not found';
                 toast.style.position = 'fixed';
@@ -470,7 +469,6 @@
                 }, 1500);
             });
 
-            // start playing
             audio.play().then(() => {
                 currentAudio = audio;
                 currentlyPlayingItem = logItem;
@@ -480,7 +478,6 @@
                     if (badge) badge.textContent = '● playing';
                 }
             }).catch(function(err) {
-                // autoplay blocked or file missing
                 if (logItem) {
                     logItem.classList.remove('playing');
                     const badge = logItem.querySelector('.play-badge');
@@ -495,13 +492,11 @@
         const logItems = document.querySelectorAll('.log-item[data-audio]');
         logItems.forEach(function(item) {
             item.addEventListener('click', function(e) {
-                // if clicking the lock link inside footer? no.
                 const src = this.getAttribute('data-audio');
                 if (!src) return;
 
                 // if same item is already playing, stop it
                 if (currentAudio && currentlyPlayingItem === this) {
-                    // toggle off
                     currentAudio.pause();
                     currentAudio.currentTime = 0;
                     this.classList.remove('playing');
@@ -512,7 +507,6 @@
                     return;
                 }
 
-                // otherwise play new
                 playAudio(src, this);
             });
         });
@@ -526,7 +520,6 @@
         }
 
         function lockInterface() {
-            // stop any playing audio when locking
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio.currentTime = 0;
@@ -578,7 +571,6 @@
             lockInterface();
         });
 
-        // initial state
         lockScreen.style.display = 'flex';
         logsContainer.style.display = 'none';
 
@@ -592,11 +584,10 @@
             errorMsg.textContent = '';
         });
 
-        // prevent accidental form submit
         const formDummy = document.querySelector('.password-input-wrapper');
         formDummy.addEventListener('submit', function(e) { e.preventDefault(); });
 
-        console.log('🔐 König voice logs · GitHub Pages ready');
+        console.log('🔐 König voice logs · ready');
     })();
 </script>
 </body>
