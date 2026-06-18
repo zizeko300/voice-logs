@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>König · voice logs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px 16px 40px;
+            color: #111;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02), 0 2px 8px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        /* --- LOCK SCREEN --- */
+        .lock-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 28px 56px;
+            min-height: 500px;
+            background: white;
+        }
+
+        .lock-icon {
+            font-size: 52px;
+            line-height: 1;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
+        .lock-title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            margin-bottom: 10px;
+            color: #000;
+        }
+
+        .lock-hint {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 32px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .password-input-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .password-field {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1.5px solid #e5e5ea;
+            border-radius: 60px;
+            font-size: 17px;
+            background: #f9f9fb;
+            outline: none;
+            transition: border 0.2s, background 0.2s;
+            text-align: center;
+            letter-spacing: 1px;
+            color: #111;
+            font-weight: 450;
+        }
+
+        .password-field:focus {
+            border-color: #007aff;
+            background: white;
+        }
+
+        .password-field::placeholder {
+            color: #aaa;
+            letter-spacing: 0.3px;
+            font-weight: 350;
+        }
+
+        .unlock-btn {
+            background: #007aff;
+            border: none;
+            border-radius: 80px;
+            padding: 16px 26px;
+            font-size: 17px;
+            font-weight: 590;
+            color: white;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.08s;
+            box-shadow: 0 2px 10px rgba(0, 122, 255, 0.2);
+            letter-spacing: 0.3px;
+            width: 100%;
+        }
+
+        .unlock-btn:active {
+            background: #005bbf;
+            transform: scale(0.97);
+        }
+
+        .error-message {
+            color: #d70015;
+            font-size: 14px;
+            margin-top: 12px;
+            text-align: center;
+            min-height: 20px;
+            font-weight: 460;
+        }
+
+        /* --- LOGS LIST (hidden by default) --- */
+        .logs-container {
+            display: none;
+            padding: 20px 18px 36px;
+            background: white;
+        }
+
+        .logs-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logs-header h1 {
+            font-size: 23px;
+            font-weight: 640;
+            letter-spacing: -0.4px;
+            color: #000;
+        }
+
+        .logs-header span {
+            font-size: 13px;
+            color: #888;
+            font-weight: 420;
+        }
+
+        .log-item {
+            background: #fafafc;
+            border-radius: 24px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border: 1px solid #f0f0f2;
+            transition: background 0.1s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+            cursor: pointer;
+        }
+
+        .log-item:active {
+            background: #f2f2f5;
+        }
+
+        .log-index {
+            background: #e8e8ed;
+            color: #333;
+            font-weight: 550;
+            font-size: 15px;
+            width: 38px;
+            height: 38px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: #eaeaef;
+        }
+
+        .log-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .log-label {
+            font-size: 16px;
+            font-weight: 540;
+            color: #111;
+            letter-spacing: -0.2px;
+        }
+
+        .log-sub {
+            font-size: 13px;
+            color: #777;
+            font-weight: 390;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .play-badge {
+            background: #007aff10;
+            color: #007aff;
+            font-size: 11px;
+            font-weight: 520;
+            padding: 2px 12px;
+            border-radius: 50px;
+            letter-spacing: 0.2px;
+            border: 0.5px solid #007aff20;
+        }
+
+        .file-tag {
+            background: #eaeef2;
+            color: #444;
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-weight: 470;
+        }
+
+        .now-playing-indicator {
+            font-size: 11px;
+            color: #007aff;
+            font-weight: 490;
+            background: #007aff08;
+            padding: 2px 10px;
+            border-radius: 40px;
+            border: 0.5px solid #007aff18;
+            display: inline-block;
+        }
+
+        .footer-lock {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .lock-link {
+            color: #8e8e93;
+            font-size: 14px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            text-decoration-color: #ccc;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 12px;
+        }
+
+        .lock-link:active {
+            color: #007aff;
+        }
+
+        /* placeholder for mp3 – visual only */
+        .mock-wave {
+            width: 42px;
+            height: 24px;
+            background: repeating-linear-gradient(90deg, 
+                #cacad0 0px, #cacad0 2px, 
+                transparent 2px, transparent 5px);
+            background-size: 8px 100%;
+            opacity: 0.45;
+            border-radius: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .log-item.playing .mock-wave {
+            opacity: 0.85;
+            background: repeating-linear-gradient(90deg, 
+                #007aff 0px, #007aff 2px, 
+                transparent 2px, transparent 5px);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body { background: #fff; }
+            .app-container { background: white; }
+            .lock-screen { background: white; }
+            .logs-container { background: white; }
+            .log-item { background: #f8f8fa; border-color: #eeeef0; }
+            .password-field { background: #f5f5f7; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="appContainer">
+
+    <!-- LOCK SCREEN -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-icon">🎙️</div>
+        <div class="lock-title">Voice Logs</div>
+        <div class="lock-hint">enter passcode to access</div>
+
+        <div class="password-input-wrapper">
+            <input type="password" id="passwordInput" class="password-field" placeholder="passcode" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <button class="unlock-btn" id="unlockBtn">Unlock</button>
+        </div>
+        <div class="error-message" id="errorMsg"></div>
+    </div>
+
+    <!-- LOGS CONTENT -->
+    <div class="logs-container" id="logsContainer">
+        <div class="logs-header">
+            <h1>König · logs</h1>
+            <span>5 files</span>
+        </div>
+
+        <!-- log items – click to play audio/audio/log1.mp3 etc. -->
+        <div class="log-item" data-audio="audio/log1.mp3">
+            <div class="log-index">1</div>
+            <div class="log-info">
+                <div class="log-label">May 12, 2024</div>
+                <div class="log-sub">
+                    <span class="file-tag">mp3</span>
+                    <span class="play-badge">▶ listen</span>
+                </div>
+            </div>
+            <div class="mock-wave"></div>
+        </div>
+
+        <div class="log-item" data-audio="audio/log2.mp3">
+            <div class="log-index">2</div>
+            <div class="log-info">
+                <div class="log-label">June 3, 2024</div>
+                <div class="log-sub">
+                    <span class="file-tag">mp3</span>
+                    <span class="play-badge">▶ listen</span>
+                </div>
+            </div>
+            <div class="mock-wave"></div>
+        </div>
+
+        <div class="log-item" data-audio="audio/log3.mp3">
+            <div class="log-index">3</div>
+            <div class="log-info">
+                <div class="log-label">July 22, 2024</div>
+                <div class="log-sub">
+                    <span class="file-tag">mp3</span>
+                    <span class="play-badge">▶ listen</span>
+                </div>
+            </div>
+            <div class="mock-wave"></div>
+        </div>
+
+        <div class="log-item" data-audio="audio/log4.mp3">
+            <div class="log-index">4</div>
+            <div class="log-info">
+                <div class="log-label">August 15, 2024</div>
+                <div class="log-sub">
+                    <span class="file-tag">mp3</span>
+                    <span class="play-badge">▶ listen</span>
+                </div>
+            </div>
+            <div class="mock-wave"></div>
+        </div>
+
+        <div class="log-item" data-audio="audio/log5.mp3">
+            <div class="log-index">5</div>
+            <div class="log-info">
+                <div class="log-label">September 29, 2024</div>
+                <div class="log-sub">
+                    <span class="file-tag">mp3</span>
+                    <span class="play-badge">▶ listen</span>
+                </div>
+            </div>
+            <div class="mock-wave"></div>
+        </div>
+
+        <!-- lock again -->
+        <div class="footer-lock">
+            <button class="lock-link" id="relockBtn">← lock logs</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const CORRECT_PASSWORD = "KT-koenig-voice";
+
+        const lockScreen = document.getElementById('lockScreen');
+        const logsContainer = document.getElementById('logsContainer');
+        const passwordInput = document.getElementById('passwordInput');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const relockBtn = document.getElementById('relockBtn');
+
+        // ---------- AUDIO PLAYER ----------
+        let currentAudio = null;
+        let currentlyPlayingItem = null;
+
+        function playAudio(src, logItem) {
+            // stop previous
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                if (currentlyPlayingItem) {
+                    currentlyPlayingItem.classList.remove('playing');
+                    const badge = currentlyPlayingItem.querySelector('.play-badge');
+                    if (badge) badge.textContent = '▶ listen';
+                }
+            }
+
+            if (!src) {
+                currentAudio = null;
+                currentlyPlayingItem = null;
+                return;
+            }
+
+            const audio = new Audio(src);
+            audio.addEventListener('ended', function() {
+                if (logItem) {
+                    logItem.classList.remove('playing');
+                    const badge = logItem.querySelector('.play-badge');
+                    if (badge) badge.textContent = '▶ listen';
+                }
+                if (currentAudio === audio) {
+                    currentAudio = null;
+                    currentlyPlayingItem = null;
+                }
+            });
+
+            audio.addEventListener('error', function() {
+                // silently fail – maybe file not found
+                if (logItem) {
+                    logItem.classList.remove('playing');
+                    const badge = logItem.querySelector('.play-badge');
+                    if (badge) badge.textContent = '▶ listen';
+                }
+                currentAudio = null;
+                currentlyPlayingItem = null;
+                // optional short toast
+                const toast = document.createElement('div');
+                toast.textContent = '⚠️ audio file not found';
+                toast.style.position = 'fixed';
+                toast.style.bottom = '30px';
+                toast.style.left = '20px';
+                toast.style.right = '20px';
+                toast.style.backgroundColor = '#333';
+                toast.style.color = 'white';
+                toast.style.padding = '12px 18px';
+                toast.style.borderRadius = '60px';
+                toast.style.fontSize = '14px';
+                toast.style.textAlign = 'center';
+                toast.style.zIndex = '99';
+                toast.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.2s';
+                document.body.appendChild(toast);
+                requestAnimationFrame(() => { toast.style.opacity = '1'; });
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 250);
+                }, 1500);
+            });
+
+            // start playing
+            audio.play().then(() => {
+                currentAudio = audio;
+                currentlyPlayingItem = logItem;
+                if (logItem) {
+                    logItem.classList.add('playing');
+                    const badge = logItem.querySelector('.play-badge');
+                    if (badge) badge.textContent = '● playing';
+                }
+            }).catch(function(err) {
+                // autoplay blocked or file missing
+                if (logItem) {
+                    logItem.classList.remove('playing');
+                    const badge = logItem.querySelector('.play-badge');
+                    if (badge) badge.textContent = '▶ listen';
+                }
+                currentAudio = null;
+                currentlyPlayingItem = null;
+            });
+        }
+
+        // attach click to each log item
+        const logItems = document.querySelectorAll('.log-item[data-audio]');
+        logItems.forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                // if clicking the lock link inside footer? no.
+                const src = this.getAttribute('data-audio');
+                if (!src) return;
+
+                // if same item is already playing, stop it
+                if (currentAudio && currentlyPlayingItem === this) {
+                    // toggle off
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    this.classList.remove('playing');
+                    const badge = this.querySelector('.play-badge');
+                    if (badge) badge.textContent = '▶ listen';
+                    currentAudio = null;
+                    currentlyPlayingItem = null;
+                    return;
+                }
+
+                // otherwise play new
+                playAudio(src, this);
+            });
+        });
+
+        // ---------- LOCK / UNLOCK ----------
+        function unlockInterface() {
+            lockScreen.style.display = 'none';
+            logsContainer.style.display = 'block';
+            errorMsg.textContent = '';
+            passwordInput.value = '';
+        }
+
+        function lockInterface() {
+            // stop any playing audio when locking
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                if (currentlyPlayingItem) {
+                    currentlyPlayingItem.classList.remove('playing');
+                    const badge = currentlyPlayingItem.querySelector('.play-badge');
+                    if (badge) badge.textContent = '▶ listen';
+                }
+                currentAudio = null;
+                currentlyPlayingItem = null;
+            }
+            lockScreen.style.display = 'flex';
+            logsContainer.style.display = 'none';
+            errorMsg.textContent = '';
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+
+        function attemptUnlock() {
+            const inputVal = passwordInput.value.trim();
+            if (inputVal === CORRECT_PASSWORD) {
+                unlockInterface();
+            } else {
+                errorMsg.textContent = '✗ wrong passcode · try again';
+                passwordInput.value = '';
+                passwordInput.focus();
+                passwordInput.style.transition = 'border 0.1s';
+                passwordInput.style.borderColor = '#d70015';
+                setTimeout(() => {
+                    passwordInput.style.borderColor = '#e5e5ea';
+                }, 300);
+            }
+        }
+
+        unlockBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            attemptUnlock();
+        });
+
+        passwordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                attemptUnlock();
+            }
+        });
+
+        relockBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            lockInterface();
+        });
+
+        // initial state
+        lockScreen.style.display = 'flex';
+        logsContainer.style.display = 'none';
+
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                passwordInput.focus();
+            }, 200);
+        });
+
+        passwordInput.addEventListener('input', function() {
+            errorMsg.textContent = '';
+        });
+
+        // prevent accidental form submit
+        const formDummy = document.querySelector('.password-input-wrapper');
+        formDummy.addEventListener('submit', function(e) { e.preventDefault(); });
+
+        console.log('🔐 König voice logs · GitHub Pages ready');
+    })();
+</script>
+</body>
+</html>
