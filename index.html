@@ -3,601 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>König · voice logs</title>
+    <title>König · log records</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+            background:#ffffff;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+            padding:20px 16px 60px;color:#111;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 20px 16px 40px;
-            color: #111;
+        .app-container{
+            width:100%;max-width:460px;margin:0 auto;background:white;border-radius:38px;
+            box-shadow:0 6px 28px rgba(0,0,0,0.04);padding:24px 16px 32px;position:relative;
         }
-
-        .app-container {
-            width: 100%;
-            max-width: 440px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 34px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
-            padding: 28px 20px 32px;
-            position: relative;
+        /* 锁屏 */
+        .lock-screen{
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            padding:44px 12px 52px;min-height:340px;
         }
-
-        /* ---------- 锁屏界面 ---------- */
-        .lock-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 12px 40px;
-            min-height: 360px;
+        .lock-icon{font-size:56px;margin-bottom:6px;}
+        .lock-title{font-size:28px;font-weight:670;letter-spacing:-0.3px;margin-bottom:4px;}
+        .lock-hint{font-size:15px;color:#888;margin-bottom:26px;}
+        .password-input-wrapper{width:100%;display:flex;flex-direction:column;gap:14px;}
+        .password-field{
+            width:100%;padding:18px 22px;border:1.5px solid #e5e5ea;border-radius:90px;font-size:18px;
+            background:#f9f9fb;outline:none;text-align:center;letter-spacing:2px;color:#111;font-weight:450;
         }
-
-        .lock-icon {
-            font-size: 54px;
-            margin-bottom: 8px;
+        .password-field:focus{border-color:#007aff;background:white;}
+        .unlock-btn{
+            background:#000;border:none;border-radius:80px;padding:18px 26px;font-size:18px;font-weight:590;
+            color:white;cursor:pointer;transition:background 0.15s,transform 0.08s;box-shadow:0 4px 14px rgba(0,0,0,0.12);
+            width:100%;
         }
-
-        .lock-title {
-            font-size: 26px;
-            font-weight: 660;
-            letter-spacing: -0.3px;
-            margin-bottom: 6px;
+        .unlock-btn:active{background:#222;transform:scale(0.95);}
+        .error-message{color:#d70015;font-size:14px;margin-top:10px;text-align:center;min-height:22px;font-weight:470;}
+        /* 主界面（默认隐藏） */
+        .main-interface{display:none;position:relative;}
+        .top-bar{
+            display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
         }
-
-        .lock-hint {
-            font-size: 15px;
-            color: #888;
-            margin-bottom: 28px;
-            font-weight: 400;
+        .top-bar h2{font-size:20px;font-weight:640;color:#000;}
+        .dir-btn{
+            background:none;border:none;font-size:26px;cursor:pointer;padding:6px 10px;color:#222;transition:opacity 0.1s;
+            line-height:1;letter-spacing:2px;
         }
-
-        .password-input-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
+        .dir-btn:active{opacity:0.5;}
+        /* 目录浮层 */
+        .directory-overlay{
+            display:none;position:absolute;top:46px;right:0;background:white;border-radius:24px;
+            box-shadow:0 8px 30px rgba(0,0,0,0.12);padding:14px 0;width:200px;z-index:99;
+            border:1px solid #eeeef2;
         }
-
-        .password-field {
-            width: 100%;
-            padding: 18px 22px;
-            border: 1.5px solid #e5e5ea;
-            border-radius: 70px;
-            font-size: 18px;
-            background: #f9f9fb;
-            outline: none;
-            transition: border 0.2s, background 0.2s;
-            text-align: center;
-            letter-spacing: 2px;
-            color: #111;
-            font-weight: 450;
+        .directory-overlay.show{display:block;}
+        .dir-item{
+            padding:14px 22px;font-size:17px;font-weight:500;color:#111;cursor:pointer;
+            transition:background 0.08s;display:flex;align-items:center;gap:8px;
         }
-
-        .password-field:focus {
-            border-color: #007aff;
-            background: white;
+        .dir-item:active{background:#f2f2f7;}
+        .dir-item span{color:#555;font-size:15px;}
+        /* 各面板 */
+        .panel{display:none;animation:fade 0.12s ease;}
+        .panel.active{display:block;}
+        @keyframes fade{0%{opacity:0.85;}100%{opacity:1;}}
+        /* 电子任务单 */
+        .task-panel{padding:8px 0;}
+        .task-header{text-align:center;font-size:30px;font-weight:700;letter-spacing:1px;margin:10px 0 18px;color:#111;}
+        .task-table{background:#f8f8fc;border-radius:28px;padding:20px 18px;border:1px solid #efeff2;}
+        .task-row{display:flex;margin-bottom:10px;font-size:15px;line-height:1.5;}
+        .task-label{width:110px;font-weight:550;color:#444;flex-shrink:0;}
+        .task-value{color:#111;font-weight:440;}
+        .task-note{margin-top:14px;font-size:13px;color:#777;border-top:1px solid #e6e6ec;padding-top:14px;}
+        .task-status{background:#e9f6eb;border-radius:40px;padding:4px 14px;display:inline-block;font-size:13px;font-weight:560;color:#18653b;margin-top:8px;}
+        /* 声音日志 */
+        .voice-panel{}
+        .logs-list{display:flex;flex-direction:column;gap:14px;}
+        .log-card{background:#f8f8fc;border-radius:26px;border:1px solid #efeff2;overflow:hidden;}
+        .log-main{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;min-height:72px;}
+        .log-info{display:flex;flex-direction:column;gap:4px;flex:1;}
+        .log-title{font-weight:610;font-size:17px;color:#111;}
+        .log-duration{font-size:13px;color:#8a8a8e;}
+        .progress-wrap{width:64px;height:4px;background:#dddde3;border-radius:6px;overflow:hidden;margin-top:4px;}
+        .progress-fill{height:100%;background:#000;border-radius:6px;width:0%;transition:width 0.1s linear;}
+        .play-btn{
+            width:58px;height:58px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center;
+            cursor:pointer;flex-shrink:0;margin-left:10px;box-shadow:0 4px 10px rgba(0,0,0,0.06);transition:transform 0.08s;
         }
-
-        .password-field::placeholder {
-            color: #b0b0b5;
-            letter-spacing: 0.3px;
-            font-weight: 380;
-            font-size: 16px;
+        .play-btn:active{transform:scale(0.86);background:#222;}
+        .play-icon{width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;border-left:17px solid white;margin-left:4px;transition:border 0.1s;}
+        .playing .play-icon{border:none;width:22px;height:22px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/%3E%3C/svg%3E") center/contain no-repeat;margin-left:0;}
+        .transcript-toggle{font-size:13px;color:#8a8a8e;background:none;border:none;padding:4px 20px 10px;cursor:pointer;display:block;width:100%;text-align:left;}
+        .transcript-body{display:none;padding:0 20px 14px;font-size:14px;line-height:1.6;color:#333;white-space:pre-wrap;border-top:1px solid #e8e8ee;margin:0 10px;padding-top:12px;}
+        .transcript-body.open{display:block;}
+        .voice-epilogue{
+            margin-top:20px;text-align:center;border-top:1px solid #f0f0f2;padding-top:16px;
         }
-
-        .unlock-btn {
-            background: #000;
-            border: none;
-            border-radius: 80px;
-            padding: 18px 26px;
-            font-size: 18px;
-            font-weight: 590;
-            color: white;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.08s;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-            letter-spacing: 0.5px;
-            width: 100%;
+        .epilogue-toggle{
+            background:none;border:none;color:#7c7c82;font-size:14px;font-weight:480;padding:6px 14px;cursor:pointer;
+            text-decoration:underline;text-underline-offset:4px;text-decoration-color:#d0d0d5;
         }
-
-        .unlock-btn:active {
-            background: #222;
-            transform: scale(0.96);
+        .epilogue-text{
+            display:none;margin-top:14px;background:#f4f4f8;border-radius:24px;padding:16px 18px;font-size:14px;line-height:1.65;
+            color:#2c2c2e;text-align:left;white-space:pre-wrap;border:1px solid #eaeaef;
         }
-
-        .error-message {
-            color: #d70015;
-            font-size: 14px;
-            margin-top: 10px;
-            text-align: center;
-            min-height: 22px;
-            font-weight: 470;
+        .epilogue-text.open{display:block;}
+        /* 文字日志 */
+        .text-panel{}
+        .text-log-item{
+            background:#f8f8fc;border-radius:22px;margin-bottom:14px;border:1px solid #efeff2;overflow:hidden;
         }
-
-        /* ---------- 日志列表（默认隐藏） ---------- */
-        .logs-container {
-            display: none;
+        .text-log-header{
+            padding:16px 20px;font-weight:600;font-size:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
         }
-
-        h1 {
-            font-size: 27px;
-            font-weight: 650;
-            margin-bottom: 6px;
-            letter-spacing: -0.3px;
-            color: #000;
+        .text-log-header .date-badge{font-size:13px;color:#8a8a8e;font-weight:440;}
+        .text-log-body{
+            display:none;padding:0 20px 18px;font-size:14px;line-height:1.65;color:#2c2c2e;white-space:pre-wrap;
+            border-top:1px solid #e8e8ee;margin:0 12px;padding-top:14px;
         }
-
-        .subhead {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 24px;
-            font-weight: 430;
+        .text-log-body.open{display:block;}
+        .text-log-body .postscript{display:block;margin-top:12px;color:#666;font-style:normal;border-left:3px solid #ccc;padding-left:12px;}
+        .back-home{
+            margin-top:24px;text-align:center;
         }
-
-        .logs-list {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
+        .back-home button{
+            background:none;border:none;color:#8e8e93;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;
         }
-
-        /* 每个日志卡片（包裹主体 + 转录本） */
-        .log-card {
-            background: #f8f8fc;
-            border-radius: 26px;
-            border: 1px solid #efeff2;
-            overflow: hidden;
-            transition: all 0.15s ease;
-        }
-
-        .log-card:active {
-            background: #edeef2;
-        }
-
-        .log-main {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 22px;
-            cursor: pointer;
-            min-height: 82px;
-        }
-
-        .log-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-        }
-
-        .log-title {
-            font-weight: 620;
-            font-size: 18px;
-            letter-spacing: -0.2px;
-            color: #111;
-        }
-
-        .log-duration {
-            font-size: 14px;
-            color: #8a8a8e;
-            font-weight: 510;
-        }
-
-        .progress-wrap {
-            width: 68px;
-            height: 4px;
-            background: #dddde3;
-            border-radius: 6px;
-            margin-top: 6px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #000;
-            border-radius: 6px;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-
-        .play-btn {
-            width: 62px;
-            height: 62px;
-            border-radius: 50%;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.08s, background 0.15s;
-            flex-shrink: 0;
-            margin-left: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
-        }
-
-        .play-btn:active {
-            transform: scale(0.88);
-            background: #222;
-        }
-
-        .play-icon {
-            width: 0;
-            height: 0;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
-            border-left: 18px solid white;
-            margin-left: 5px;
-            transition: border 0.1s;
-        }
-
-        .playing .play-icon {
-            border: none;
-            width: 24px;
-            height: 24px;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/%3E%3C/svg%3E") center/contain no-repeat;
-            margin-left: 0;
-        }
-
-        /* “查看日志内容”按钮 */
-        .transcript-toggle {
-            font-size: 13px;
-            color: #8a8a8e;
-            font-weight: 470;
-            background: none;
-            border: none;
-            padding: 6px 22px 10px;
-            cursor: pointer;
-            display: block;
-            width: 100%;
-            text-align: left;
-            letter-spacing: 0.2px;
-            transition: color 0.1s;
-        }
-
-        .transcript-toggle:active {
-            color: #007aff;
-        }
-
-        /* 转录本文本区域（默认隐藏） */
-        .transcript-body {
-            padding: 0 22px 16px;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #333;
-            white-space: pre-wrap;
-            word-break: break-word;
-            display: none;
-            border-top: 1px solid #e8e8ee;
-            margin: 0 12px;
-            padding-top: 12px;
-        }
-
-        .transcript-body.open {
-            display: block;
-        }
-
-        .status-bar {
-            font-size: 13px;
-            color: #aaa;
-            margin-bottom: 8px;
-            text-align: right;
-        }
-
-        .footer-note {
-            margin-top: 28px;
-            text-align: center;
-            font-size: 13px;
-            color: #bbb;
-            border-top: 1px solid #f0f0f2;
-            padding-top: 20px;
-        }
-
-        .relock-area {
-            margin-top: 16px;
-            text-align: center;
-        }
-
-        .relock-btn {
-            background: none;
-            border: none;
-            color: #8e8e93;
-            font-size: 14px;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            text-decoration-color: #ccc;
-            padding: 8px 16px;
-            cursor: pointer;
-        }
-
-        .relock-btn:active {
-            color: #007aff;
-        }
+        .status-line{font-size:13px;color:#aaa;margin-bottom:6px;text-align:right;}
     </style>
 </head>
 <body>
-
 <div class="app-container">
     <!-- 锁屏 -->
     <div class="lock-screen" id="lockScreen">
-        <div class="lock-icon">🎙️</div>
-        <div class="lock-title">Voice Logs</div>
-        <div class="lock-hint">enter passcode to access</div>
+        <div class="lock-icon">📓</div>
+        <div class="lock-title">Log Records</div>
+        <div class="lock-hint">enter passcode</div>
         <div class="password-input-wrapper">
-            <input type="password" id="passwordInput" class="password-field" placeholder="passcode" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-            <button class="unlock-btn" id="unlockBtn">Unlock</button>
+            <input type="password" id="passwordInput" class="password-field" placeholder="passcode" autocomplete="off">
+            <button class="unlock-btn" id="unlockBtn">🔓 Unlock</button>
         </div>
         <div class="error-message" id="errorMsg"></div>
     </div>
 
-    <!-- 日志列表 -->
-    <div class="logs-container" id="logsContainer">
-        <div class="status-bar">● 5 files</div>
-        <h1>Voice Logs</h1>
-        <div class="subhead">König · secure channel</div>
+    <!-- 主界面 -->
+    <div class="main-interface" id="mainInterface">
+        <div class="top-bar">
+            <h2 id="panelTitle">📋 task order</h2>
+            <button class="dir-btn" id="dirBtn">☰</button>
+        </div>
+        <!-- 目录浮层 -->
+        <div class="directory-overlay" id="dirOverlay">
+            <div class="dir-item" data-panel="task"><span>📋</span> 1. Electronic Task Record</div>
+            <div class="dir-item" data-panel="voice"><span>🎙️</span> 2. Voice Logs</div>
+            <div class="dir-item" data-panel="text"><span>📝</span> 3. Text Logs</div>
+        </div>
 
-        <div class="logs-list">
-            <!-- Log 1 -->
-            <div class="log-card">
-                <div class="log-main" data-audio="log1.mp3">
-                    <div class="log-info">
-                        <div class="log-title">Log_01</div>
-                        <div class="log-duration">00:36</div>
-                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
-                    </div>
-                    <div class="play-btn"><div class="play-icon"></div></div>
+        <!-- 电子任务单 -->
+        <div class="panel active" id="taskPanel">
+            <div class="task-panel">
+                <div class="task-header">KORTAC</div>
+                <div class="task-table">
+                    <div class="task-row"><span class="task-label">Operator</span><span class="task-value">König</span></div>
+                    <div class="task-row"><span class="task-label">ID</span><span class="task-value">KT-246E87D33</span></div>
+                    <div class="task-row"><span class="task-label">Mission</span><span class="task-value">Basic Security Detail</span></div>
+                    <div class="task-row"><span class="task-label">Sensitivity</span><span class="task-value">★☆☆☆☆</span></div>
+                    <div class="task-row"><span class="task-label">Location</span><span class="task-value">North America East Outpost</span></div>
+                    <div class="task-row"><span class="task-label">Duration</span><span class="task-value">2024 – 2025.9</span></div>
+                    <div class="task-note">⏱️ system note: extended to 2026.04 due to unavoidable reasons (approved)</div>
+                    <div class="task-row" style="margin-top:6px;"><span class="task-label">Details</span><span class="task-value">Non-restricted area, civilian presence possible. Avoid conflict unless necessary.</span></div>
+                    <div class="task-status">✔ completed & archived</div>
                 </div>
-                <button class="transcript-toggle">view transcript</button>
-                <div class="transcript-body">It's May 12, 2024, 4:23 PM. This is König.
-The rain came fast. I found a cave to shelter in. It's quiet here, just the sound of rain filling everything. Too humid for a fire. My clothes are wet, my toes are numb, but I'm okay. Outside is just gray fog. The world has shrunk to this cave entrance. I heard something. Maybe a deer, maybe just rain. That's all.</div>
-            </div>
-
-            <!-- Log 2 -->
-            <div class="log-card">
-                <div class="log-main" data-audio="log2.mp3">
-                    <div class="log-info">
-                        <div class="log-title">Log_02</div>
-                        <div class="log-duration">00:36</div>
-                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
-                    </div>
-                    <div class="play-btn"><div class="play-icon"></div></div>
-                </div>
-                <button class="transcript-toggle">view transcript</button>
-                <div class="transcript-body">It's June 3, 2024, 4:55 AM. This is König.
-I'm at the highest point of the east ridge, ten minutes early. The air is cold and clean before dawn. I'm waiting for the colors to change. White, then pale blue, then a streak of pink, then orange. Dawn comes faster than you think. I was thinking, I wish you were here. The sun is up now. I need to get down before the light gets too strong. Log complete.</div>
-            </div>
-
-            <!-- Log 3 -->
-            <div class="log-card">
-                <div class="log-main" data-audio="log3.mp3">
-                    <div class="log-info">
-                        <div class="log-title">Log_03</div>
-                        <div class="log-duration">00:30</div>
-                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
-                    </div>
-                    <div class="play-btn"><div class="play-icon"></div></div>
-                </div>
-                <button class="transcript-toggle">view transcript</button>
-                <div class="transcript-body">It's July 22, 2024, 9:15 AM. This is König.
-I found a rabbit den near West Creek. The mother saw me, but she didn't run. I didn't move either. She relaxed after a moment. There are three or four kits. So small I can barely see their fur. She keeps licking their foreheads. I don't know why this scene made me feel something. Alright, I need to go. Log complete.</div>
-            </div>
-
-            <!-- Log 4 -->
-            <div class="log-card">
-                <div class="log-main" data-audio="log4.mp3">
-                    <div class="log-info">
-                        <div class="log-title">Log_04</div>
-                        <div class="log-duration">00:34</div>
-                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
-                    </div>
-                    <div class="play-btn"><div class="play-icon"></div></div>
-                </div>
-                <button class="transcript-toggle">view transcript</button>
-                <div class="transcript-body">It's August 15, 2024, 3:40 PM. This is König.
-I'm walking through the forest between West Creek and the main ridge. I don't know why, but I started thinking of you. When you walk alone for too long, and it gets too quiet, your mind wanders. Today, I keep thinking about your face. Sometimes I pretend you're listening. I talk to myself as I walk. Alright, I need to keep moving. Log complete.</div>
-            </div>
-
-            <!-- Log 5 -->
-            <div class="log-card">
-                <div class="log-main" data-audio="log5.mp3">
-                    <div class="log-info">
-                        <div class="log-title">Log_05</div>
-                        <div class="log-duration">00:34</div>
-                        <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
-                    </div>
-                    <div class="play-btn"><div class="play-icon"></div></div>
-                </div>
-                <button class="transcript-toggle">view transcript</button>
-                <div class="transcript-body">It's September 29, 2024, 5:50 PM. This is König.
-I fell in the east rock zone. My right arm got cut on a sharp piece of slate. About four centimeters long. I rinsed it with creek water, cleaned it with iodine gauze, and wrapped it tight. Bleeding stopped. Lucky it's not my right hand, I can still write. I need to get back to base before sunset. Lesson: don't step on loose rocks. Log complete.</div>
             </div>
         </div>
 
-        <div class="footer-note">tap to play · pause</div>
-        <div class="relock-area">
-            <button class="relock-btn" id="relockBtn">← lock logs</button>
+        <!-- 声音日志 -->
+        <div class="panel" id="voicePanel">
+            <div class="voice-panel">
+                <div class="status-line">🎧 5 files</div>
+                <div class="logs-list">
+                    <div class="log-card"><div class="log-main" data-audio="log1.mp3"><div class="log-info"><div class="log-title">Log_01</div><div class="log-duration">00:36</div><div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div></div><div class="play-btn"><div class="play-icon"></div></div></div><button class="transcript-toggle">view transcript</button><div class="transcript-body">It's May 12, 2024, 4:23 PM. This is König. The rain came fast. I found a cave to shelter in. It's quiet here, just the sound of rain filling everything. Too humid for a fire. My clothes are wet, my toes are numb, but I'm okay. Outside is just gray fog. The world has shrunk to this cave entrance. I heard something. Maybe a deer, maybe just rain. That's all.</div></div>
+                    <div class="log-card"><div class="log-main" data-audio="log2.mp3"><div class="log-info"><div class="log-title">Log_02</div><div class="log-duration">00:36</div><div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div></div><div class="play-btn"><div class="play-icon"></div></div></div><button class="transcript-toggle">view transcript</button><div class="transcript-body">It's June 3, 2024, 4:55 AM. This is König. I'm at the highest point of the east ridge, ten minutes early. The air is cold and clean before dawn. I'm waiting for the colors to change. White, then pale blue, then a streak of pink, then orange. Dawn comes faster than you think. I was thinking, I wish you were here. The sun is up now. I need to get down before the light gets too strong. Log complete.</div></div>
+                    <div class="log-card"><div class="log-main" data-audio="log3.mp3"><div class="log-info"><div class="log-title">Log_03</div><div class="log-duration">00:30</div><div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div></div><div class="play-btn"><div class="play-icon"></div></div></div><button class="transcript-toggle">view transcript</button><div class="transcript-body">It's July 22, 2024, 9:15 AM. This is König. I found a rabbit den near West Creek. The mother saw me, but she didn't run. I didn't move either. She relaxed after a moment. There are three or four kits. So small I can barely see their fur. She keeps licking their foreheads. I don't know why this scene made me feel something. Alright, I need to go. Log complete.</div></div>
+                    <div class="log-card"><div class="log-main" data-audio="log4.mp3"><div class="log-info"><div class="log-title">Log_04</div><div class="log-duration">00:34</div><div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div></div><div class="play-btn"><div class="play-icon"></div></div></div><button class="transcript-toggle">view transcript</button><div class="transcript-body">It's August 15, 2024, 3:40 PM. This is König. I'm walking through the forest between West Creek and the main ridge. I don't know why, but I started thinking of you. When you walk alone for too long, and it gets too quiet, your mind wanders. Today, I keep thinking about your face. Sometimes I pretend you're listening. I talk to myself as I walk. Alright, I need to keep moving. Log complete.</div></div>
+                    <div class="log-card"><div class="log-main" data-audio="log5.mp3"><div class="log-info"><div class="log-title">Log_05</div><div class="log-duration">00:34</div><div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div></div><div class="play-btn"><div class="play-icon"></div></div></div><button class="transcript-toggle">view transcript</button><div class="transcript-body">It's September 29, 2024, 5:50 PM. This is König. I fell in the east rock zone. My right arm got cut on a sharp piece of slate. About four centimeters long. I rinsed it with creek water, cleaned it with iodine gauze, and wrapped it tight. Bleeding stopped. Lucky it's not my right hand, I can still write. I need to get back to base before sunset. Lesson: don't step on loose rocks. Log complete.</div></div>
+                </div>
+                <!-- 声音日志后记 -->
+                <div class="voice-epilogue">
+                    <button class="epilogue-toggle" id="voiceEpilogueToggle">📖 afterword · postscript</button>
+                    <div class="epilogue-text" id="voiceEpilogueText">Actually, there's more data beyond 2024 — I recorded many logs afterward. But not long after, listening back felt a bit embarrassing. They weren't exactly official logs anyway, so I deleted them all. These few probably survived because I didn't clear them thoroughly. I really should have deleted them, but some of them hold scenes and things I wanted to share with you. In the end, I kept them for you to hear. Please don't laugh at me.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文字日志 -->
+        <div class="panel" id="textPanel">
+            <div class="text-panel">
+                <div class="status-line">📄 5 entries</div>
+                <div class="text-log-item">
+                    <div class="text-log-header"><span>🗺️ Found an Old Map</span><span class="date-badge">2025</span></div>
+                    <div class="text-log-body">Today while helping the archivist organize files, I found a map of this area. Dated 1978, older than me. Since it was obsolete, I took it without trouble. I don't know why I grabbed it — we have updated maps now. Maybe I wanted to see what changed since 1978. Carrying it during patrol feels like opening a blind box.<span class="postscript">Postscript: I visited many places with that old map. Some remained unchanged, others transformed completely. I marked everything on it. It felt like an exploration game. Made patrol less boring.</span></div>
+                </div>
+                <div class="text-log-item">
+                    <div class="text-log-header"><span>📅 Extension Reason</span><span class="date-badge">2026</span></div>
+                    <div class="text-log-body">Originally supposed to end by late 2025, but extended to April 2026. Basic security details like this I usually avoid — low pay, sometimes tedious. But this time was different. The surroundings gave me peace. Sunlight, streams, birdsong. Lively yet quiet. Thanks to the employer's last minute decision, I could stay longer. I must visit again someday.</div>
+                </div>
+                <div class="text-log-item">
+                    <div class="text-log-header"><span>📝 Why Are My Notes Always Dirty</span><span class="date-badge">2025</span></div>
+                    <div class="text-log-body">Somehow these papers always end up stained. Mud, coffee, even sweat marks. I swear I'm not doing it on purpose. The pages survive but look filthy. Seems I'm not the only one weathered. The most memorable was when someone ran over my dropped paper with a vehicle. The tire track is still impossible to clean.</div>
+                </div>
+                <div class="text-log-item">
+                    <div class="text-log-header"><span>🐇 Rabbit</span><span class="date-badge">2024</span></div>
+                    <div class="text-log-body">Probably an Appalachian cottontail, living in an oak hollow. Clever creature using natural tree cavities. Not as varied as domestic rabbits, but alert and fast. Every survivor in the wild has its skill.</div>
+                </div>
+                <div class="text-log-item">
+                    <div class="text-log-header"><span>🪨 Stone Formation</span><span class="date-badge">2025</span></div>
+                    <div class="text-log-body">Following the old map, I discovered a stone cluster near base not marked on any chart. Not exactly a megalith, just extra rocks. Not present during the 1978 survey. What caused it? Possibly extreme weather — heavy rain washing away soil and vegetation, exposing bedrock. Or maybe human made, used as markers. New discovery noted.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-home">
+            <button id="relockBtn">🔒 lock logs</button>
         </div>
     </div>
 </div>
-
 <script>
-    (function() {
-        const CORRECT_PASSWORD = "KT-koenig-voice";
+(function(){
+    const PASSWORD = "KT-koenig-log23703E";
+    const lockScreen = document.getElementById('lockScreen');
+    const mainInterface = document.getElementById('mainInterface');
+    const passwordInput = document.getElementById('passwordInput');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const relockBtn = document.getElementById('relockBtn');
 
-        const lockScreen = document.getElementById('lockScreen');
-        const logsContainer = document.getElementById('logsContainer');
-        const passwordInput = document.getElementById('passwordInput');
-        const unlockBtn = document.getElementById('unlockBtn');
-        const errorMsg = document.getElementById('errorMsg');
-        const relockBtn = document.getElementById('relockBtn');
+    function unlock(){
+        lockScreen.style.display='none'; mainInterface.style.display='block'; errorMsg.textContent=''; passwordInput.value='';
+        showPanel('task');
+    }
+    function lock(){
+        if(window.currentAudio){window.currentAudio.pause();window.currentAudio.currentTime=0;if(window.currentItem){window.currentItem.classList.remove('playing');const f=window.currentItem.querySelector('.progress-fill');if(f)f.style.width='0%';}window.currentAudio=null;window.currentItem=null;}
+        lockScreen.style.display='flex'; mainInterface.style.display='none'; errorMsg.textContent=''; passwordInput.value='';
+    }
+    unlockBtn.addEventListener('click',function(e){e.preventDefault(); if(passwordInput.value.trim()===PASSWORD){unlock();}else{errorMsg.textContent='✗ wrong passcode'; passwordInput.value='';}});
+    passwordInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault(); unlockBtn.click();}});
+    relockBtn.addEventListener('click',function(e){e.preventDefault(); lock();});
+    lockScreen.style.display='flex'; mainInterface.style.display='none';
 
-        // 解锁
-        function unlockInterface() {
-            lockScreen.style.display = 'none';
-            logsContainer.style.display = 'block';
-            errorMsg.textContent = '';
-            passwordInput.value = '';
+    // 目录
+    const dirBtn=document.getElementById('dirBtn');
+    const dirOverlay=document.getElementById('dirOverlay');
+    dirBtn.addEventListener('click',function(e){e.stopPropagation(); dirOverlay.classList.toggle('show');});
+    document.addEventListener('click',function(e){ if(!dirOverlay.contains(e.target) && e.target!==dirBtn) dirOverlay.classList.remove('show');});
+
+    // 面板切换
+    const panels={task:document.getElementById('taskPanel'),voice:document.getElementById('voicePanel'),text:document.getElementById('textPanel')};
+    const panelTitles={task:'📋 task order',voice:'🎙️ voice logs',text:'📝 text logs'};
+    function showPanel(name){
+        Object.keys(panels).forEach(k=>panels[k].classList.toggle('active',k===name));
+        document.getElementById('panelTitle').textContent=panelTitles[name]||'📋 task order';
+        dirOverlay.classList.remove('show');
+        // 声音后记只出现在声音界面
+        if(name!=='voice'){
+            const epi=document.getElementById('voiceEpilogueText');
+            if(epi)epi.classList.remove('open');
+            const tog=document.getElementById('voiceEpilogueToggle');
+            if(tog)tog.textContent='📖 afterword · postscript';
         }
+    }
+    document.querySelectorAll('.dir-item').forEach(item=>{
+        item.addEventListener('click',function(){ const p=this.dataset.panel; if(p) showPanel(p); });
+    });
+    showPanel('task');
 
-        // 锁定
-        function lockInterface() {
-            if (window.currentAudio) {
-                window.currentAudio.pause();
-                window.currentAudio.currentTime = 0;
-                if (window.currentItem) {
-                    window.currentItem.classList.remove('playing');
-                    const fill = window.currentItem.querySelector('.progress-fill');
-                    if (fill) fill.style.width = '0%';
-                }
-                window.currentAudio = null;
-                window.currentItem = null;
-            }
-            lockScreen.style.display = 'flex';
-            logsContainer.style.display = 'none';
-            errorMsg.textContent = '';
-            passwordInput.value = '';
-            passwordInput.focus();
-        }
-
-        function attemptUnlock() {
-            const inputVal = passwordInput.value.trim();
-            if (inputVal === CORRECT_PASSWORD) {
-                unlockInterface();
-            } else {
-                errorMsg.textContent = '✗ wrong passcode · try again';
-                passwordInput.value = '';
-                passwordInput.focus();
-                passwordInput.style.transition = 'border 0.1s';
-                passwordInput.style.borderColor = '#d70015';
-                setTimeout(() => {
-                    passwordInput.style.borderColor = '#e5e5ea';
-                }, 300);
-            }
-        }
-
-        unlockBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            attemptUnlock();
+    // 音频
+    const playBtns=document.querySelectorAll('#voicePanel .play-btn');
+    playBtns.forEach(btn=>{
+        btn.addEventListener('click',function(e){
+            e.stopPropagation(); const main=btn.closest('.log-main'); const item=main;
+            if(window.currentItem===item && window.currentAudio && !window.currentAudio.paused){window.currentAudio.pause();item.classList.remove('playing');return;}
+            if(window.currentAudio){window.currentAudio.pause();window.currentAudio.currentTime=0;if(window.currentItem){window.currentItem.classList.remove('playing');const f=window.currentItem.querySelector('.progress-fill');if(f)f.style.width='0%';}}
+            const src=item.getAttribute('data-audio'); const audio=new Audio(src); window.currentAudio=audio; window.currentItem=item;
+            audio.addEventListener('timeupdate',function(){if(!audio.duration)return; const p=(audio.currentTime/audio.duration)*100; const fill=item.querySelector('.progress-fill'); if(fill)fill.style.width=Math.min(p,100)+'%';});
+            audio.play().then(()=>item.classList.add('playing')).catch(()=>alert('⚠️ audio file not found: '+src));
+            audio.addEventListener('ended',function(){item.classList.remove('playing'); const fill=item.querySelector('.progress-fill'); if(fill)fill.style.width='0%';});
         });
+    });
+    document.querySelectorAll('#voicePanel .log-main').forEach(m=>m.addEventListener('click',function(e){if(e.target.closest('.play-btn'))return; const b=this.querySelector('.play-btn'); if(b)b.click();}));
 
-        passwordInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                e.preventDefault();
-                attemptUnlock();
-            }
-        });
+    // 转录本
+    document.querySelectorAll('#voicePanel .transcript-toggle').forEach(t=>{
+        t.addEventListener('click',function(e){e.stopPropagation(); const card=this.closest('.log-card'); const body=card.querySelector('.transcript-body'); body.classList.toggle('open'); this.textContent=body.classList.contains('open')?'hide transcript':'view transcript';});
+    });
 
-        relockBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            lockInterface();
-        });
+    // 声音后记
+    const epiToggle=document.getElementById('voiceEpilogueToggle');
+    const epiText=document.getElementById('voiceEpilogueText');
+    epiToggle.addEventListener('click',function(e){e.stopPropagation(); epiText.classList.toggle('open'); this.textContent=epiText.classList.contains('open')?'📖 hide afterword':'📖 afterword · postscript';});
 
-        lockScreen.style.display = 'flex';
-        logsContainer.style.display = 'none';
-
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                passwordInput.focus();
-            }, 300);
-        });
-
-        passwordInput.addEventListener('input', function() {
-            errorMsg.textContent = '';
-        });
-
-        // ---------- 音频播放 + 进度条 ----------
-        const playButtons = document.querySelectorAll('.play-btn');
-        
-        playButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const main = btn.closest('.log-main');
-                const item = main;
-                const audioSrc = item.getAttribute('data-audio');
-                
-                if (window.currentItem === item) {
-                    if (window.currentAudio && !window.currentAudio.paused) {
-                        window.currentAudio.pause();
-                        item.classList.remove('playing');
-                        return;
-                    }
-                }
-
-                if (window.currentAudio) {
-                    window.currentAudio.pause();
-                    window.currentAudio.currentTime = 0;
-                    if (window.currentItem) {
-                        window.currentItem.classList.remove('playing');
-                        const oldFill = window.currentItem.querySelector('.progress-fill');
-                        if (oldFill) oldFill.style.width = '0%';
-                    }
-                }
-
-                const audio = new Audio(audioSrc);
-                window.currentAudio = audio;
-                window.currentItem = item;
-                
-                audio.addEventListener('timeupdate', () => {
-                    if (!audio.duration) return;
-                    const percent = (audio.currentTime / audio.duration) * 100;
-                    const fill = item.querySelector('.progress-fill');
-                    if (fill) fill.style.width = Math.min(percent, 100) + '%';
-                });
-
-                audio.play().then(() => {
-                    item.classList.add('playing');
-                }).catch(err => {
-                    alert('⚠️ audio file not found: ' + audioSrc);
-                });
-
-                audio.addEventListener('ended', () => {
-                    item.classList.remove('playing');
-                    const fill = item.querySelector('.progress-fill');
-                    if (fill) fill.style.width = '0%';
-                });
-            });
-        });
-
-        // 点击整行（log-main）也能触发播放
-        document.querySelectorAll('.log-main').forEach(main => {
-            main.addEventListener('click', function(e) {
-                if (e.target.closest('.play-btn')) return;
-                const btn = this.querySelector('.play-btn');
-                if (btn) btn.click();
-            });
-        });
-
-        // ---------- 转录本切换 ----------
-        document.querySelectorAll('.transcript-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const card = this.closest('.log-card');
-                const body = card.querySelector('.transcript-body');
-                if (body.classList.contains('open')) {
-                    body.classList.remove('open');
-                    this.textContent = 'view transcript';
-                } else {
-                    body.classList.add('open');
-                    this.textContent = 'hide transcript';
-                }
-            });
-        });
-
-        const formDummy = document.querySelector('.password-input-wrapper');
-        formDummy.addEventListener('submit', function(e) { e.preventDefault(); });
-    })();
+    // 文字日志展开
+    document.querySelectorAll('.text-log-header').forEach(h=>{
+        h.addEventListener('click',function(){ const body=this.parentElement.querySelector('.text-log-body'); if(body) body.classList.toggle('open'); });
+    });
+})();
 </script>
-
 </body>
 </html>
-    
